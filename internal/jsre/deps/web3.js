@@ -2542,7 +2542,7 @@ var RequestManager = require('./web3/requestmanager');
 var Iban = require('./web3/iban');
 var Ftm = require('./web3/methods/ftm');
 var Debug = require('./web3/methods/debug');
-var Sfc = require('./web3/methods/sfc');
+var Staking = require('./web3/methods/staking');
 var DB = require('./web3/methods/db');
 var Shh = require('./web3/methods/shh');
 var Net = require('./web3/methods/net');
@@ -2566,7 +2566,7 @@ function Web3 (provider) {
     this.currentProvider = provider;
     this.ftm = new Ftm(this);
     this.debug = new Debug(this);
-    this.sfc = new Sfc(this);
+    this.staking = new Staking(this);
     this.db = new DB(this);
     this.shh = new Shh(this);
     this.net = new Net(this);
@@ -2663,7 +2663,7 @@ Web3.prototype.createBatch = function () {
 module.exports = Web3;
 
 
-},{"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/extend":28,"./web3/httpprovider":32,"./web3/iban":33,"./web3/ipcprovider":34,"./web3/methods/db":37,"./web3/methods/ftm":38,"./web3/methods/debug":380,"./web3/methods/sfc":381,"./web3/methods/net":39,"./web3/methods/personal":40,"./web3/methods/shh":41,"./web3/methods/swarm":42,"./web3/property":45,"./web3/requestmanager":46,"./web3/settings":47,"bignumber.js":"bignumber.js"}],23:[function(require,module,exports){
+},{"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/extend":28,"./web3/httpprovider":32,"./web3/iban":33,"./web3/ipcprovider":34,"./web3/methods/db":37,"./web3/methods/ftm":38,"./web3/methods/debug":380,"./web3/methods/staking":381,"./web3/methods/net":39,"./web3/methods/personal":40,"./web3/methods/shh":41,"./web3/methods/swarm":42,"./web3/property":45,"./web3/requestmanager":46,"./web3/settings":47,"bignumber.js":"bignumber.js"}],23:[function(require,module,exports){
 /*
     This file is part of web3.js.
 
@@ -5966,7 +5966,7 @@ module.exports = Debug;
       along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
 */
 /**
- * @file sfc.js
+ * @file staking.js
  * @author Marek Kotewicz <marek@ethdev.com>
  * @author Fabian Vogelsteller <fabian@ethdev.com>
  * @author devintegral3 <devintegral3@sfxdx.ru>
@@ -5988,7 +5988,7 @@ var namereg = require('../namereg');
 var Iban = require('../iban');
 var transfer = require('../transfer');
 
-function Sfc(web3) {
+function Staking(web3) {
     this._requestManager = web3._requestManager;
 
     var self = this;
@@ -6012,7 +6012,7 @@ var methods = function () {
 
     var getValidationScore = new Method({
       name: 'getValidationScore',
-      call: 'sfc_getValidationScore',
+      call: 'staking_getValidationScore',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputBigNumberFormatter
@@ -6020,7 +6020,7 @@ var methods = function () {
 
     var getOriginationScore = new Method({
       name: 'getOriginationScore',
-      call: 'sfc_getOriginationScore',
+      call: 'staking_getOriginationScore',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputBigNumberFormatter
@@ -6028,7 +6028,7 @@ var methods = function () {
 
     var getStakerPoI = new Method({
       name: 'getStakerPoI',
-      call: 'sfc_getStakerPoI',
+      call: 'staking_getStakerPoI',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputBigNumberFormatter
@@ -6036,7 +6036,7 @@ var methods = function () {
 
     var getRewardWeights = new Method({
       name: 'getRewardWeights',
-      call: 'sfc_getRewardWeights',
+      call: 'staking_getRewardWeights',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputDecimalProperties
@@ -6044,7 +6044,7 @@ var methods = function () {
 
     var getDowntime = new Method({
       name: 'getDowntime',
-      call: 'sfc_getDowntime',
+      call: 'staking_getDowntime',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputDecimalProperties
@@ -6052,7 +6052,7 @@ var methods = function () {
 
     var getStaker = new Method({
       name: 'getStaker',
-      call: 'sfc_getStaker',
+      call: 'staking_getStaker',
       params: 2,
       inputFormatter: [utils.toHex, utils.toHex],
       outputFormatter: formatters.outputStakerFormatter
@@ -6060,7 +6060,7 @@ var methods = function () {
 
     var getStakerByAddress = new Method({
       name: 'getStakerByAddress',
-      call: 'sfc_getStakerByAddress',
+      call: 'staking_getStakerByAddress',
       params: 2,
       inputFormatter: [utils.toHex, utils.toHex],
       outputFormatter: formatters.outputStakerFormatter
@@ -6068,7 +6068,7 @@ var methods = function () {
 
     var getStakers = new Method({
       name: 'getStakers',
-      call: 'sfc_getStakers',
+      call: 'staking_getStakers',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputStakersFormatter
@@ -6076,7 +6076,7 @@ var methods = function () {
 
     var getDelegationsOf = new Method({
       name: 'getDelegationsOf',
-      call: 'sfc_getDelegationsOf',
+      call: 'staking_getDelegationsOf',
       params: 2,
       inputFormatter: [utils.toHex, utils.toHex],
       outputFormatter: formatters.outputDelegationsFormatter
@@ -6084,7 +6084,7 @@ var methods = function () {
 
     var getDelegationsByAddress = new Method({
       name: 'getDelegationsByAddress',
-      call: 'sfc_getDelegationsByAddress',
+      call: 'staking_getDelegationsByAddress',
       params: 2,
       inputFormatter: [utils.toHex, utils.toHex],
       outputFormatter: formatters.outputDelegationsFormatter
@@ -6092,7 +6092,7 @@ var methods = function () {
 
     var getDelegation = new Method({
       name: 'getDelegation',
-      call: 'sfc_getDelegation',
+      call: 'staking_getDelegation',
       params: 3,
       inputFormatter: [utils.toHex, utils.toHex, utils.toHex],
       outputFormatter: formatters.outputDelegationFormatter
@@ -6100,7 +6100,7 @@ var methods = function () {
 
     var getDelegationClaimedRewards = new Method({
       name: 'getDelegationClaimedRewards',
-      call: 'sfc_getDelegationClaimedRewards',
+      call: 'staking_getDelegationClaimedRewards',
       params: 2,
       inputFormatter: [utils.toHex, utils.toHex],
       outputFormatter: formatters.outputBigNumberFormatter
@@ -6108,7 +6108,7 @@ var methods = function () {
 
     var getStakerClaimedRewards = new Method({
       name: 'getStakerClaimedRewards',
-      call: 'sfc_getStakerClaimedRewards',
+      call: 'staking_getStakerClaimedRewards',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputBigNumberFormatter
@@ -6116,7 +6116,7 @@ var methods = function () {
 
     var getStakerDelegationsClaimedRewards = new Method({
       name: 'getStakerDelegationsClaimedRewards',
-      call: 'sfc_getStakerDelegationsClaimedRewards',
+      call: 'staking_getStakerDelegationsClaimedRewards',
       params: 1,
       inputFormatter: [utils.toHex],
       outputFormatter: formatters.outputBigNumberFormatter
@@ -6144,7 +6144,7 @@ var properties = function () {
     return [];
 };
 
-module.exports = Sfc;
+module.exports = Staking;
 
 },{"../../utils/config":18,"../../utils/utils":20,"../contract":25,"../filter":29,"../formatters":30,"../iban":33,"../method":36,"../namereg":44,"../property":45,"../syncing":48,"../transfer":49,"./watches":43}],39:[function(require,module,exports){
 /*
