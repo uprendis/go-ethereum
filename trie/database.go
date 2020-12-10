@@ -281,9 +281,9 @@ func NewDatabaseWithCache(diskdb ethdb.KeyValueStore, cache int, journal string)
 	var cleans *fastcache.Cache
 	if cache > 0 {
 		if journal == "" {
-			cleans = fastcache.New(cache * 1024 * 1024)
+			cleans = fastcache.New(cache * 1024)
 		} else {
-			cleans = fastcache.LoadFromFileOrNew(journal, cache*1024*1024)
+			cleans = fastcache.LoadFromFileOrNew(journal, cache*1024)
 		}
 	}
 	return &Database{
@@ -581,7 +581,7 @@ func (db *Database) Cap(limit common.StorageSize) error {
 
 	// If the preimage cache got large enough, push to disk. If it's still small
 	// leave for later to deduplicate writes.
-	flushPreimages := db.preimagesSize > 4*1024*1024
+	flushPreimages := db.preimagesSize > 1024
 	if flushPreimages {
 		rawdb.WritePreimages(batch, db.preimages)
 		if batch.ValueSize() > ethdb.IdealBatchSize {

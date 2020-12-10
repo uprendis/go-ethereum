@@ -72,7 +72,7 @@ func loadSnapshot(diskdb ethdb.KeyValueStore, triedb *trie.Database, cache int, 
 	base := &diskLayer{
 		diskdb: diskdb,
 		triedb: triedb,
-		cache:  fastcache.New(cache * 1024 * 1024),
+		cache:  fastcache.New(cache * 1024),
 		root:   baseRoot,
 	}
 	// Retrieve the journal, it must exist since even for 0 layer it stores whether
