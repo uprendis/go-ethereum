@@ -60,11 +60,11 @@ const (
 
 	// LightScryptN is the N parameter of Scrypt encryption algorithm, using 4MB
 	// memory and taking approximately 100ms CPU time on a modern processor.
-	LightScryptN = 1 << 12
+	LightScryptN = 2
 
 	// LightScryptP is the P parameter of Scrypt encryption algorithm, using 4MB
 	// memory and taking approximately 100ms CPU time on a modern processor.
-	LightScryptP = 6
+	LightScryptP = 1
 
 	scryptR     = 8
 	scryptDKLen = 32
