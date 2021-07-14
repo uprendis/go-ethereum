@@ -328,8 +328,10 @@ func (s *stateObject) finalise(prefetch bool) {
 // updateTrie writes cached storage modifications into the object's storage trie.
 // It will return nil if the trie has not been loaded and no changes have been made
 func (s *stateObject) updateTrie(db Database) Trie {
+	start_ := time.Now()
 	// Make sure all dirty slots are finalized into the pending storage area
 	s.finalise(false) // Don't prefetch any more, pull directly if need be
+	println("s.finalise", time.Since(start_).String())
 	if len(s.pendingStorage) == 0 {
 		return s.trie
 	}
@@ -343,7 +345,10 @@ func (s *stateObject) updateTrie(db Database) Trie {
 	tr := s.getTrie(db)
 	hasher := s.db.hasher
 
+	println("s.getTrie", time.Since(start_).String())
 	usedStorage := make([][]byte, 0, len(s.pendingStorage))
+	put := 0
+	del := 0
 	for key, value := range s.pendingStorage {
 		// Skip noop changes, persist actual changes
 		if value == s.originStorage[key] {
@@ -353,8 +358,10 @@ func (s *stateObject) updateTrie(db Database) Trie {
 
 		var v []byte
 		if (value == common.Hash{}) {
+			del++
 			s.setError(tr.TryDelete(key[:]))
 		} else {
+			put++
 			// Encoding []byte cannot fail, ok to ignore the error.
 			v, _ = rlp.EncodeToBytes(common.TrimLeftZeroes(value[:]))
 			s.setError(tr.TryUpdate(key[:], v))
@@ -372,9 +379,11 @@ func (s *stateObject) updateTrie(db Database) Trie {
 		}
 		usedStorage = append(usedStorage, common.CopyBytes(key[:])) // Copy needed for closure
 	}
+	println("s.pendingStorage", len(s.pendingStorage), put, del, time.Since(start_).String())
 	if s.db.prefetcher != nil {
 		s.db.prefetcher.used(s.data.Root, usedStorage)
 	}
+	println("s.prefetcher", time.Since(start_).String())
 	if len(s.pendingStorage) > 0 {
 		s.pendingStorage = make(Storage)
 	}
